@@ -2,6 +2,7 @@ trigger:
 - master
 
 pool:
+  name: 'Azure Pilines'
   vmImage: ubuntu-latest
 
 steps:
