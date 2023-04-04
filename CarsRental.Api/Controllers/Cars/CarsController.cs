@@ -4,11 +4,13 @@ using CarsRental.Application.Cars.Queries.GetAll;
 using CarsRental.Application.Cars.Queries.GetById;
 using CarsRental.Domain.Cars;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace CarsRental.Api.Controllers.Cars
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     [ApiVersion("1.0")]
@@ -20,6 +22,7 @@ namespace CarsRental.Api.Controllers.Cars
             _mediator = mediator;
         }
         // GET: api/<CarsController>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IEnumerable<ReadCarModel>> Get()
         {
@@ -41,7 +44,7 @@ namespace CarsRental.Api.Controllers.Cars
             return car;
         }
 
-        // POST api/<CarsController>
+        // POST api/<CarsController>,
         [HttpPost]
         public async Task<Car> Post([FromBody] CreateCarModel car)
         {
