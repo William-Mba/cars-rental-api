@@ -22,38 +22,34 @@ variables:
 
 steps:
 - task: DotNetCoreCLI@2
-  displayName: Restore
+  displayName: "Restoring packages.." 
   inputs:
     command: restore
     projects: '$(Parameters.RestoreBuildProjects)'
-  displayName: "Restoring packages.." 
 
 - task: DotNetCoreCLI@2
-  displayName: Build
+  displayName: "[Build] Building packages.." 
   inputs:
     projects: '$(Parameters.RestoreBuildProjects)'
     arguments: '--configuration $(BuildConfiguration)'
-  displayName: "Building packages.." 
 
 - task: DotNetCoreCLI@2
-  displayName: Test
+  displayName: "[Test] Executing Tests.." 
   inputs:
     command: test
     projects: '$(Parameters.TestProjects)'
     arguments: '--configuration $(BuildConfiguration)'
-  displayName: "Executing tests.." 
 
 - task: DotNetCoreCLI@2
-  displayName: Publish
+  displayName: "[Publish] Publishing artefacts.." 
   inputs:
     command: publish
     publishWebProjects: True
     arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
     zipAfterPublish: True
-  displayName: "Publishing artefacts.." 
 
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
+  displayName: '[Publish] Publish Artifact'
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)'
   condition: succeededOrFailed()
@@ -68,10 +64,9 @@ steps:
   displayName: "Packaging.." 
 
 - task: NuGetAuthenticate@0
-  displayName: 'NuGet Authenticate'
+  displayName: '[Authentication] NuGet Authentication'
   inputs:
     nuGetServiceConnections: az-artifacts-sc
-  displayName: "Authenticating.." 
 
 - script: |
     dotnet build $(Build.ArtifactStagingDirectory) --configuration $(BuildConfiguration)
