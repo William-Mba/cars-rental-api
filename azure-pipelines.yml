@@ -22,22 +22,38 @@ variables:
 
 
 steps:
+
 - task: UseDotNet@2
   displayName: 'Sélection de la version de .NET'
   inputs:
     packageType: 'sdk'
     version: '$(dotnetSdkVersion)'
-- task: DotNetCoreCLI@2
-  displayName: "[Restore] Restoring packages.." 
-  inputs:
-    command: restore
-    projects: '$(parameters.RestoreBuildProjects)'
 
 - task: DotNetCoreCLI@2
-  displayName: "[Build] Building packages.." 
+  displayName: "[Restore] Restoring packages.."
   inputs:
-    projects: '$(parameters.RestoreBuildProjects)'
-    arguments: '--configuration $(BuildConfiguration)'
+    command: 'restore'
+    projects: 'https://dev.azure.com/10ference/FormationDevOps/_git/SpaceGame/**/*.csproj'
+    restoreArguments: '-p:AssemblyVersion=$(Major).$(Minor).$(Patch).$(rev:.r)'
+    feedsToUse: 'select'
+    vstsFeed: 'db55ada9-b434-4bdc-bfd5-90d3c7fae142/dd0205ff-7e0a-485b-8c26-ae86e9b0ba98' 
+
+# - task: DotNetCoreCLI@2
+#   displayName: "[Restore] Restoring packages.." 
+#   inputs:
+#     command: restore
+#     projects: '$(parameters.RestoreBuildProjects)'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: 'https://dev.azure.com/10ference/FormationDevOps/_git/SpaceGame/**/*.csproj'
+    arguments: '--configuration $(BuildConfiguration) -p:AssemblyVersion=$(Major).$(Minor).$(Patch).$(rev:.r)'
+
+# - task: DotNetCoreCLI@2
+#   displayName: "[Build] Building packages.." 
+#   inputs:
+#     projects: '$(parameters.RestoreBuildProjects)'
+#     arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: "[Test] Executing Tests.." 
@@ -76,6 +92,6 @@ steps:
 
 - script: |
     dotnet build $(Build.ArtifactStagingDirectory) --configuration $(BuildConfiguration)
-    dotnet pack $(Build.ArtifactStagingDirectory) -p:PackageVersion='$(Major).$(Minor).$(Patch).$(rev:.r)' --output $(Build.ArtifactStagingDirectory) --configuration <CONFIGURATION>
+    dotnet pack $(Build.ArtifactStagingDirectory) --output $(Build.ArtifactStagingDirectory) --configuration <CONFIGURATION>
     dotnet nuget push $(Build.ArtifactStagingDirectory) --source https://pkgs.dev.azure.com/10ference/db55ada9-b434-4bdc-bfd5-90d3c7fae142/_packaging/carsrental-api/nuget/v3/index.json --api-key "az-artifacts-sc"
   displayName: "Build, pack and push"  
