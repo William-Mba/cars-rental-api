@@ -18,9 +18,15 @@ variables:
   Minor: '0'
   Patch: '0'
   BuildConfiguration: 'Release'
+  dotnetSdkVersion: 6.0
 
 
 steps:
+- task: UseDotNet@2
+  displayName: 'Sélection de la version de .NET'
+  inputs:
+    packageType: 'sdk'
+    version: '$(dotnetSdkVersion)'
 - task: DotNetCoreCLI@2
   displayName: "[Restore] Restoring packages.." 
   inputs:
@@ -53,3 +59,23 @@ steps:
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)'
   condition: succeededOrFailed()
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: pack
+    versioningScheme: byPrereleaseNumber
+    majorVersion: '$(Major)'
+    minorVersion: '$(Minor)'
+    patchVersion: '$(Patch)'
+  displayName: "Packaging.." 
+
+- task: NuGetAuthenticate@0
+  displayName: '[Authentication] NuGet Authentication'
+  inputs:
+    nuGetServiceConnections: az-artifacts-sc
+
+- script: |
+    dotnet build $(Build.ArtifactStagingDirectory) --configuration $(BuildConfiguration)
+    dotnet pack $(Build.ArtifactStagingDirectory) -p:PackageVersion='$(Major).$(Minor).$(Patch).$(rev:.r)' --output $(Build.ArtifactStagingDirectory) --configuration <CONFIGURATION>
+    dotnet nuget push $(Build.ArtifactStagingDirectory) --source https://pkgs.dev.azure.com/10ference/db55ada9-b434-4bdc-bfd5-90d3c7fae142/_packaging/carsrental-api/nuget/v3/index.json --api-key "az-artifacts-sc"
+  displayName: "Build, pack and push"  
