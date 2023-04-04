@@ -73,10 +73,3 @@ steps:
     dotnet pack $(Build.ArtifactStagingDirectory) -p:PackageVersion='$(Major).$(Minor).$(Patch).$(rev:.r)' --output $(Build.ArtifactStagingDirectory) --configuration <CONFIGURATION>
     dotnet nuget push $(Build.ArtifactStagingDirectory) --source https://pkgs.dev.azure.com/10ference/db55ada9-b434-4bdc-bfd5-90d3c7fae142/_packaging/carsrental-api/nuget/v3/index.json --api-key "az-artifacts-sc"
   displayName: "Build, pack and push"  
-
-- task: NuGetCommand@2
-  displayName: 'NuGet push'
-  inputs:
-    command: push
-    nuGetFeedType: external
-    publishFeedCredentials: nuget.org
