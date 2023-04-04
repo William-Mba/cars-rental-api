@@ -22,22 +22,22 @@ variables:
 
 steps:
 - task: DotNetCoreCLI@2
-  displayName: "Restoring packages.." 
+  displayName: "[Restore] Restoring packages.." 
   inputs:
     command: restore
-    projects: '$(Parameters.RestoreBuildProjects)'
+    projects: '$(parameters.RestoreBuildProjects)'
 
 - task: DotNetCoreCLI@2
   displayName: "[Build] Building packages.." 
   inputs:
-    projects: '$(Parameters.RestoreBuildProjects)'
+    projects: '$(parameters.RestoreBuildProjects)'
     arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: "[Test] Executing Tests.." 
   inputs:
     command: test
-    projects: '$(Parameters.TestProjects)'
+    projects: '$(parameters.TestProjects)'
     arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
