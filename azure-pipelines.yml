@@ -14,6 +14,9 @@ parameters:
     default: '**/*[Tt]ests/*.csproj'
 
 variables:
+  Major: '1'
+  Minor: '0'
+  Patch: '0'
   BuildConfiguration: 'Release'
 
 
@@ -23,12 +26,14 @@ steps:
   inputs:
     command: restore
     projects: '$(Parameters.RestoreBuildProjects)'
+  displayName: "Restoring packages.." 
 
 - task: DotNetCoreCLI@2
   displayName: Build
   inputs:
     projects: '$(Parameters.RestoreBuildProjects)'
     arguments: '--configuration $(BuildConfiguration)'
+  displayName: "Building packages.." 
 
 - task: DotNetCoreCLI@2
   displayName: Test
@@ -36,6 +41,7 @@ steps:
     command: test
     projects: '$(Parameters.TestProjects)'
     arguments: '--configuration $(BuildConfiguration)'
+  displayName: "Executing tests.." 
 
 - task: DotNetCoreCLI@2
   displayName: Publish
@@ -44,9 +50,40 @@ steps:
     publishWebProjects: True
     arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
     zipAfterPublish: True
+  displayName: "Publishing artefacts.." 
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)'
   condition: succeededOrFailed()
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: pack
+    versioningScheme: byPrereleaseNumber
+    majorVersion: '$(Major)'
+    minorVersion: '$(Minor)'
+    patchVersion: '$(Patch)'
+  displayName: "Packaging.." 
+
+- task: NuGetAuthenticate@0
+  displayName: 'NuGet Authenticate'
+  inputs:
+    nuGetServiceConnections: az-artifacts-sc
+  displayName: "Authenticating.." 
+
+- script: |
+    dotnet build $(Build.ArtifactStagingDirectory) --configuration $(BuildConfiguration)
+    dotnet pack $(Build.ArtifactStagingDirectory) -p:PackageVersion='$(Major).$(Minor).$(Patch).$(rev:.r)' --output $(Build.ArtifactStagingDirectory) --configuration <CONFIGURATION>
+    dotnet nuget push $(Build.ArtifactStagingDirectory) --source https://pkgs.dev.azure.com/10ference/db55ada9-b434-4bdc-bfd5-90d3c7fae142/_packaging/carsrental-api/nuget/v3/index.json --api-key "az-artifacts-sc"
+  displayName: "Build, pack and push"  
+
+- task: NuGetCommand@2
+  displayName: 'NuGet push'
+  inputs:
+    command: push
+    nuGetFeedType: external
+    publishFeedCredentials: nuget.org
+
+
