@@ -43,7 +43,7 @@ steps:
     packageType: 'sdk'
     version: '$(dotnetSdkVersion)'
 
-- checkout: git://dev.azure.com/10ference/Cars%20Rental%20App/_git/cars-rental-api
+- checkout: git:/Cars%20Rental%20App/_git/cars-rental-api
 
 - task: DotNetCoreCLI@2
   displayName: 'Restore packages'
