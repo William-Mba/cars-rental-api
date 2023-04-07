@@ -1,5 +1,6 @@
 using Microsoft.ApplicationInsights.Extensibility;
 using Serilog;
+using Serilog.Core;
 
 namespace CarsRental.Api
 {
@@ -10,13 +11,7 @@ namespace CarsRental.Api
         }
         public static int Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-           .MinimumLevel.Debug()
-           .Enrich.FromLogContext()
-           .WriteTo.Console()
-           .WriteTo.Trace()
-           .WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces)
-           .CreateLogger();
+            Log.Logger = ConfigureLogging();
 
             try
             {
@@ -43,6 +38,17 @@ namespace CarsRental.Api
                     webBuilder.UseStartup<Startup>();
                 });
         }
-
+        private static Logger ConfigureLogging()
+        {
+            return new LoggerConfiguration()
+                               .MinimumLevel.Debug()
+                               .Enrich.FromLogContext()
+                               .WriteTo.Console()
+                               .WriteTo.Trace()
+                               .WriteTo.ApplicationInsights(
+                                        TelemetryConfiguration.CreateDefault(),
+                                        TelemetryConverter.Traces)
+                               .CreateLogger();
+        }
     }
 }
