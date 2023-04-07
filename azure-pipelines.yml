@@ -21,7 +21,9 @@ parameters:
   - name: AssemblyVersion
     type: string
     default: "0.0.0.0"
-
+    values:
+      - $(assemblyVersion)
+      
 variables:
   BuildConfiguration: 'Release'
   dotnetSdkVersion: 6.x
@@ -73,9 +75,10 @@ steps:
     projects: '${{ parameters.RestoreBuildProjects }}'
 
 - script: >
+
     echo version : ${{ parameters.AssemblyVersion }}
   displayName: "Assembly Version Generated"
-  
+
 - task: DotNetCoreCLI@2
   displayName: "Build project" 
   inputs:
