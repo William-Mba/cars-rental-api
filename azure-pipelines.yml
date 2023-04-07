@@ -21,24 +21,26 @@ parameters:
   - name: AssemblyVersion
     type: string
     default: "0.0.0.0"
+    values:
+      - '$(assemblyVersion)'
 
 variables:
   BuildConfiguration: 'Release'
   dotnetSdkVersion: 6.x
-  buildDate: $(Get-Date -Format yyyyMMdd:hhmmss)
-  baseVersion: ${{ parameters.MajorVersion }}.${{ parameters.MinorVersion }}
-  baseVersionBeta: $(baseVersion).0-beta
+  buildDate: '$(Get-Date -Format yyyyMMdd:hhmmss)'
+  baseVersion: '${{ parameters.MajorVersion }}.${{ parameters.MinorVersion }}'
+  baseVersionBeta: '$(baseVersion).0-beta'
   ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
     versionRevision: $[counter(variables['baseVersion'], 0)]
-    version: $(baseversion).$(versionRevision)
-    assemblyVersion: $(variables.version)
+    version: '$(baseversion).$(versionRevision)'
+    assemblyVersion: '$(variables.version)'
 
   ${{ if and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))) }}:
     versionRevision: $[counter(variables['baseVersionBeta'], 0)]
-    version: $(baseVersionBeta).$(versionRevision)
-    assemblyVersion: $(baseVersion).0.$(versionRevision)
+    version: '$(baseVersionBeta).$(versionRevision)'
+    assemblyVersion: '$(baseVersion).0.$(versionRevision)'
 
-  versionLong: ${{ parameters.MajorVersion }}.${{ parameters.MinorVersion }}.$(versionRevision).$(Build.BuildID)
+  versionLong: '${{ parameters.MajorVersion }}.${{ parameters.MinorVersion }}.$(versionRevision).$(Build.BuildID)'
 
 steps:
 - checkout: self
@@ -74,14 +76,14 @@ steps:
 
 - script: >
 
-    echo version : $(assemblyVersion)
+    echo version : ${{ parameters.AssemblyVersion }}
   displayName: "Assembly Version Generated"
 
 - task: DotNetCoreCLI@2
   displayName: "Build project" 
   inputs:
     projects: '${{ parameters.RestoreBuildProjects }}'
-    arguments: '--configuration $(BuildConfiguration) -p:VersionPrefix=$(assemblyVersion)'
+    arguments: '--configuration $(BuildConfiguration) -p:VersionPrefix=${{ parameters.AssemblyVersion }}'
 
 - task: SonarCloudAnalyze@1
 
