@@ -18,42 +18,29 @@ variables:
   dotnetSdkVersion: 6.0.x
 
 
-steps:  
-- checkout: self
-  fetchDepth: 0
-  
+steps:
 - task: JavaToolInstaller@0
   inputs:
     versionSpec: '11'
     jdkArchitectureOption: 'x64'
-    jdkSourceOption: 'LocalDirectory'
-    jdkFile: 'C:\agents\jdk-11.0.18_windows-x64_bin.zip'
-    cleanDestinationDirectory: false
-- task: Gradle@2
-  inputs:
-    gradleWrapperFile: 'gradlew'
-    tasks: 'build'
-    publishJUnitResults: false
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
-    gradleOptions: '-Xmx3072m'
-    sonarQubeRunAnalysis: true
-- task: JavaToolInstaller@0
-  inputs:
-    versionSpec: '8'
-    jdkArchitectureOption: 'x64'
-    jdkSourceOption: 'LocalDirectory'
-    jdkFile: 'C:\agents\jdk-11.0.18_windows-x64_bin.zip'
-    cleanDestinationDirectory: false
-- task: Gradle@2
-  inputs:
-    gradleWrapperFile: 'gradlew'
-    tasks: 'build'
-    publishJUnitResults: false
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
-    gradleOptions: '-Xmx3072m'
-    sonarQubeRunAnalysis: true
+    jdkSourceOption: 'PreInstalled'
+    
+# - task: JavaToolInstaller@0
+#   inputs:
+#     versionSpec: '11'
+#     jdkArchitectureOption: 'x64'
+#     jdkSourceOption: 'LocalDirectory'
+#     jdkFile: 'C:\agents\jdk-11.0.18_windows-x64_bin.zip'
+#     cleanDestinationDirectory: false
+# - task: Gradle@2
+#   inputs:
+#     gradleWrapperFile: 'gradlew'
+#     tasks: 'build'
+#     publishJUnitResults: false
+#     javaHomeOption: 'JDKVersion'
+#     jdkVersionOption: '1.11'
+#     gradleOptions: '-Xmx3072m'
+#     sonarQubeRunAnalysis: true
 
 - task: SonarCloudPrepare@1
   inputs:
