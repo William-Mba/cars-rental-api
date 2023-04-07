@@ -62,9 +62,9 @@ namespace CarsRental.Api.Extensions
             {
                 var provider = app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
 
-                foreach (var description in provider.ApiVersionDescriptions)
+                foreach (var groupName in provider.ApiVersionDescriptions.Select(x => x.GroupName).Where(x => x != null))
                 {
-                    c.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", $"Cars Rental {description.GroupName}");
+                    c.SwaggerEndpoint($"/swagger/{groupName}/swagger.json", $"Cars Rental {groupName}");
                 }
                 c.EnableTryItOutByDefault();
             });

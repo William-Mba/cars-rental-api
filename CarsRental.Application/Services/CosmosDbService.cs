@@ -10,7 +10,7 @@ namespace CarsRental.Application.Services
         protected readonly ICosmosDbClientFactory _cosmosDbClientFactory;
         public abstract string ContainerName { get; }
 
-        public CosmosDbService(ICosmosDbClientFactory cosmosDbClientFactory)
+        protected CosmosDbService(ICosmosDbClientFactory cosmosDbClientFactory)
         {
             _cosmosDbClientFactory = cosmosDbClientFactory;
             var dbId = _cosmosDbClientFactory.Settings.DatabaseName;

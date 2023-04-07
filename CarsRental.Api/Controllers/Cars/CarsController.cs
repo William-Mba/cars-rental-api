@@ -70,7 +70,7 @@ namespace CarsRental.Api.Controllers.Cars
         [HttpDelete("{id}")]
         public void Delete(string id)
         {
-
+            // DOTO Implement this
         }
     }
 }

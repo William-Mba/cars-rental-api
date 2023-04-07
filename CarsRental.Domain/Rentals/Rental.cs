@@ -11,7 +11,7 @@ namespace CarsRental.Domain.Rentals
         public decimal Price
         {
             get => Car.Cost * ((decimal)(Car.CostType == CostType.Hourly ? TotalHours : TotalDays));
-            set { }
+            set => SetPrice(value);
         }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
@@ -22,6 +22,13 @@ namespace CarsRental.Domain.Rentals
         public double TotalDays
         {
             get => (End - Start).TotalDays;
+        }
+        public void SetPrice(decimal price)
+        {
+            if (price >= 1)
+            {
+                Price = price;
+            }
         }
     }
 }

@@ -5,6 +5,9 @@ namespace CarsRental.Api
 {
     public class Program
     {
+        protected Program()
+        {
+        }
         public static int Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
