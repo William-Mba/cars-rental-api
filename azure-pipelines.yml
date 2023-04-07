@@ -22,7 +22,7 @@ parameters:
     type: string
     default: "0.0.0.0"
     values:
-      - '${{ assemblyVersion }}'
+      - '$(assemblyVersion)'
 
 variables:
   BuildConfiguration: 'Release'
