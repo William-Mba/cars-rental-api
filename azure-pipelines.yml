@@ -21,8 +21,6 @@ parameters:
   - name: AssemblyVersion
     type: string
     default: "0.0.0.0"
-    values:
-      - '$(assemblyVersion)'
 
 variables:
   BuildConfiguration: 'Release'
@@ -76,14 +74,14 @@ steps:
 
 - script: >
 
-    echo version : ${{ parameters.AssemblyVersion }}
+    echo version : $(assemblyVersion)
   displayName: "Assembly Version Generated"
 
 - task: DotNetCoreCLI@2
   displayName: "Build project" 
   inputs:
     projects: '${{ parameters.RestoreBuildProjects }}'
-    arguments: '--configuration $(BuildConfiguration) -p:VersionPrefix=${{ parameters.AssemblyVersion }}'
+    arguments: '--configuration $(BuildConfiguration) -p:VersionPrefix=$(assemblyVersion)'
 
 - task: SonarCloudAnalyze@1
 
