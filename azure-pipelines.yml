@@ -3,7 +3,7 @@ trigger:
 
 pool:
   name: svr-cr
-  vmImage: ubuntu-latest
+  vmImage: windows-latest
 
 parameters:
   - name: RestoreBuildProjects
@@ -27,7 +27,7 @@ steps:
     versionSpec: '11'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: 'LocalDirectory'
-    jdkFile: 'C:\jdk-11.0.10.zip'
+    jdkFile: 'C:\agents\jdk-11.0.18_windows-x64_bin.zip'
     cleanDestinationDirectory: false
 - task: Gradle@2
   inputs:
@@ -43,7 +43,7 @@ steps:
     versionSpec: '8'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: 'LocalDirectory'
-    jdkFile: 'C:\jdk1.8.0_281.zip'
+    jdkFile: 'C:\agents\jdk-11.0.18_windows-x64_bin.zip'
     cleanDestinationDirectory: false
 - task: Gradle@2
   inputs:
