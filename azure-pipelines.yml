@@ -41,9 +41,6 @@ variables:
   versionLong: '${{ parameters.MajorVersion }}.${{ parameters.MinorVersion }}.$(versionRevision).$(Build.BuildID)'
 
 steps:
-- checkout: self
-  fetchDepth: 0
-
 - task: JavaToolInstaller@0
   displayName: 'Use JDK'
   inputs:
@@ -90,28 +87,14 @@ steps:
     projects: '${{ parameters.TestProjects }}'
     arguments: '--configuration $(BuildConfiguration)'
 
-# - task: DotNetCoreCLI@2
-#   displayName: "Publish artefacts" 
-#   inputs:
-#     command: publish
-#     publishWebProjects: True
-#     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-#     zipAfterPublish: True
-#     modifyOutputPath: true
-
-- task: PublishBuildArtifacts@1
-  displayName: "Publish Binairies"
+- task: DotNetCoreCLI@2
+  displayName: "Publish artefacts" 
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
-
-- task: DownloadBuildArtifacts@1
-  inputs:
-    buildType: 'current'
-    downloadType: 'single'
-    artifactName: 'drop'
-    downloadPath: '$(System.ArtifactsDirectory)'
+    command: 'publish'
+    publishWebProjects: false
+    projects: '${{ parameters.RestoreBuildProjects }}'
+    arguments: '-p:VersionPrefix=$(versionLong) --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: true
 
 - task: SonarCloudPublish@1
   displayName: "Publish SonarCloud Results" 
