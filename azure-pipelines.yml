@@ -3,7 +3,7 @@ trigger:
 
 pool:
   name: svr-cr
-  vmImage: ubuntu-latest
+  vmImage: windows-latest
 
 parameters:
   - name: RestoreBuildProjects
@@ -15,8 +15,7 @@ parameters:
 
 variables:
   BuildConfiguration: 'Release'
-  dotnetSdkVersion: 6.0.x
-
+  dotnetSdkVersion: 6.x
 
 steps:
 - checkout: self
@@ -30,34 +29,6 @@ steps:
     jdkSourceOption: 'LocalDirectory'
     jdkFile: 'C:\agents\svr-cr\jdk-11.0.18_windows-x64_bin.zip'
     cleanDestinationDirectory: false
-# - task: Gradle@3
-#   displayName: 'Use Gradle'
-#   inputs:
-#     gradleWrapperFile: 'gradlew'
-#     tasks: 'build'
-#     publishJUnitResults: false
-#     javaHomeOption: 'JDKVersion'
-#     sonarQubeRunAnalysis: true
-#     sqGradlePluginVersionChoice: 'build'
-#     spotBugsAnalysis: false
-
-# - task: JavaToolInstaller@0
-#   inputs:
-#     versionSpec: '8'
-#     jdkArchitectureOption: 'x64'
-#     jdkSourceOption: 'LocalDirectory'
-#     jdkFile: 'C:\jdk1.8.0_281.zip'
-#     cleanDestinationDirectory: false
-# - task: Gradle@2
-#   inputs:
-#     gradleWrapperFile: 'gradlew'
-#     tasks: 'build'
-#     publishJUnitResults: false
-#     javaHomeOption: 'JDKVersion'
-#     jdkVersionOption: '1.11'
-#     gradleOptions: '-Xmx3072m'
-#     sonarQubeRunAnalysis: false
-
 - task: SonarCloudPrepare@1
   inputs:
     SonarCloud: 'sonarcloud'
@@ -67,19 +38,19 @@ steps:
     projectName: 'cars-rental-api'
 
 - task: UseDotNet@2
-  displayName: 'Sélection de la version de .NET'
+  displayName: 'Use .NET'
   inputs:
     packageType: 'sdk'
     version: '$(dotnetSdkVersion)'
 
 - task: DotNetCoreCLI@2
-  displayName: "[Restore] Restoring packages.." 
+  displayName: "Restore packages" 
   inputs:
     command: restore
     projects: '$(parameters.RestoreBuildProjects)'
 
 - task: DotNetCoreCLI@2
-  displayName: "[Build] Building packages.." 
+  displayName: "Build project" 
   inputs:
     projects: '$(parameters.RestoreBuildProjects)'
     arguments: '--configuration $(BuildConfiguration)'
@@ -87,14 +58,14 @@ steps:
 - task: SonarCloudAnalyze@1
 
 - task: DotNetCoreCLI@2
-  displayName: "[Test] Executing Tests.." 
+  displayName: "Execute Tests" 
   inputs:
     command: test
     projects: '$(parameters.TestProjects)'
     arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: "[Publish] Publishing artefacts.." 
+  displayName: "Publish artefacts" 
   inputs:
     command: publish
     publishWebProjects: True
@@ -102,5 +73,6 @@ steps:
     zipAfterPublish: True
 
 - task: SonarCloudPublish@1
+  displayName: "Publish SonarCloud Results" 
   inputs:
     pollingTimeoutSec: '300'
