@@ -27,7 +27,7 @@ steps:
     versionSpec: '11'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: 'LocalDirectory'
-    jdkFile: 'C:\agents\srv-cr\jdk-11.0.18_windows-x64_bin.zip'
+    jdkFile: 'C:\agents\svr-cr\jdk-11.0.18_windows-x64_bin.zip'
     cleanDestinationDirectory: false
 - task: Gradle@2
   inputs:
