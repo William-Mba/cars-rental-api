@@ -43,24 +43,16 @@ steps:
     packageType: 'sdk'
     version: '$(dotnetSdkVersion)'
 
-- checkout: self
-
 - task: DotNetCoreCLI@2
   displayName: 'Restore packages'
   inputs:
     command: 'restore'
-    projects: '$(parameters.RestoreBuildProjects)'
-
-# - task: DotNetCoreCLI@2
-#   displayName: "Restore packages" 
-#   inputs:
-#     command: restore
-#     projects: '$(parameters.RestoreBuildProjects)'
+    projects: '${{ parameters.RestoreBuildProjects }}'
 
 - task: DotNetCoreCLI@2
   displayName: "Build project" 
   inputs:
-    projects: '$(parameters.RestoreBuildProjects)'
+    projects: '${{ parameters.RestoreBuildProjects }}'
     arguments: '--configuration $(BuildConfiguration)'
 
 - task: SonarCloudAnalyze@1
