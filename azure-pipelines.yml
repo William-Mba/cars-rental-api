@@ -76,7 +76,7 @@ steps:
   displayName: "Build project" 
   inputs:
     projects: '${{ parameters.RestoreBuildProjects }}'
-    arguments: '--configuration $(BuildConfiguration) -p:VersionPrefix=$(assemblyVersion)'
+    arguments: '--configuration $(BuildConfiguration) -p:VersionPrefix=$(versionLong)'
 
 - script: echo Version= $(versionLong)
   displayName: "Build Version"
