@@ -83,7 +83,7 @@ steps:
   displayName: "Build project" 
   inputs:
     projects: '${{ parameters.RestoreBuildProjects }}'
-    arguments: '--configuration $(BuildConfiguration) -p:VersionPrefix=$(assemblyVersion)'
+    arguments: '--configuration $(BuildConfiguration) -p:VersionPrefix=${{ parameters.AssemblyVersion }}'
 
 - task: SonarCloudAnalyze@1
 
