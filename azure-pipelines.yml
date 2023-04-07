@@ -2,6 +2,7 @@ trigger:
 - none
 
 pool:
+  name: 'Azure Pipelines'
   vmImage: ubuntu-latest
 
 parameters:
