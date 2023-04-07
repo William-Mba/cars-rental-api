@@ -87,24 +87,19 @@ steps:
     projects: '${{ parameters.TestProjects }}'
     arguments: '--configuration $(BuildConfiguration)'
 
-- task: DotNetCoreCLI@2
+- task: ArchiveFiles@2
   inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '${{ parameters.RestoreBuildProjects }}'
-    arguments: '--configuration $(BuildConfiguration) -p:VersionPrefix=$(versionLong)'
-    majorVersion: ${{ parameters.MajorVersion }}
-    minorVersion: ${{ parameters.MinorVersion }}
-    patchVersion: $(Build.BuildID)
-    publishTestResults: true
-    zipAfterPublish: true
+    rootFolderOrFile: '$(Build.BinariesDirectory)'
+    includeRootFolder: true
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory).zip'
+    replaceExistingArchive: true
 
-# - task: PublishPipelineArtifact@1
-#   displayName: "Publish artefacts" 
-#   inputs:
-#     targetPath: '$(Pipeline.Workspace)'
-#     artifact: 'drop' 
-#     publishLocation: 'pipeline'
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Pipeline.Workspace)'
+    publishLocation: 'pipeline'
+    artifact: 'drop/$(Build.ArtifactStagingDirectory).zip'
 
 - task: SonarCloudPublish@1
   displayName: "Publish SonarCloud Results" 
