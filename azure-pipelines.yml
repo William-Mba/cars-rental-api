@@ -30,16 +30,16 @@ steps:
     jdkSourceOption: 'LocalDirectory'
     jdkFile: 'C:\agents\svr-cr\jdk-11.0.18_windows-x64_bin.zip'
     cleanDestinationDirectory: false
-- task: Gradle@3
-  displayName: 'Use Gradle'
-  inputs:
-    gradleWrapperFile: 'gradlew'
-    tasks: 'build'
-    publishJUnitResults: false
-    javaHomeOption: 'JDKVersion'
-    sonarQubeRunAnalysis: true
-    sqGradlePluginVersionChoice: 'build'
-    spotBugsAnalysis: false
+# - task: Gradle@3
+#   displayName: 'Use Gradle'
+#   inputs:
+#     gradleWrapperFile: 'gradlew'
+#     tasks: 'build'
+#     publishJUnitResults: false
+#     javaHomeOption: 'JDKVersion'
+#     sonarQubeRunAnalysis: true
+#     sqGradlePluginVersionChoice: 'build'
+#     spotBugsAnalysis: false
 
 # - task: JavaToolInstaller@0
 #   inputs:
