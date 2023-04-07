@@ -42,12 +42,17 @@ steps:
   inputs:
     packageType: 'sdk'
     version: '$(dotnetSdkVersion)'
-
 - task: DotNetCoreCLI@2
-  displayName: "Restore packages" 
+  displayName: 'Restore packages'
   inputs:
-    command: restore
-    projects: '$(parameters.RestoreBuildProjects)'
+    command: 'restore'
+    projects: '**/*.csproj'
+
+# - task: DotNetCoreCLI@2
+#   displayName: "Restore packages" 
+#   inputs:
+#     command: restore
+#     projects: '$(parameters.RestoreBuildProjects)'
 
 - task: DotNetCoreCLI@2
   displayName: "Build project" 
