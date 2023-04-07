@@ -76,7 +76,7 @@ steps:
 
 - script: >
 
-    echo version : ${{ parameters.AssemblyVersion }}
+    echo version : '${{ parameters.AssemblyVersion }}'
   displayName: "Assembly Version Generated"
 
 - task: DotNetCoreCLI@2
