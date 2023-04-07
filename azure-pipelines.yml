@@ -3,7 +3,7 @@ trigger:
 
 pool:
   name: svr-cr
-  vmImage: windows-latest
+  vmImage: ubuntu-latest
 
 parameters:
   - name: RestoreBuildProjects
@@ -21,7 +21,7 @@ variables:
 steps:
 - checkout: self
   fetchDepth: 0
-  
+
 - task: JavaToolInstaller@0
   inputs:
     versionSpec: '11'
