@@ -86,15 +86,12 @@ steps:
     command: test
     projects: '${{ parameters.TestProjects }}'
     arguments: '--configuration $(BuildConfiguration)'
-
-- task: DotNetCoreCLI@2
+- task: PublishPipelineArtifact@1
   displayName: "Publish artefacts" 
   inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '${{ parameters.RestoreBuildProjects }}'
-    arguments: '-p:VersionPrefix=$(versionLong) --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-    zipAfterPublish: true
+    targetPath: '$(Pipeline.Workspace)'
+    artifact: 'drop' 
+    publishLocation: 'pipeline'
 
 - task: SonarCloudPublish@1
   displayName: "Publish SonarCloud Results" 
