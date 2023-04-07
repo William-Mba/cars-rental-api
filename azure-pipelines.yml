@@ -19,6 +19,39 @@ variables:
 
 
 steps:  
+- task: JavaToolInstaller@0
+  inputs:
+    versionSpec: '11'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'LocalDirectory'
+    jdkFile: 'C:\jdk-11.0.10.zip'
+    cleanDestinationDirectory: false
+- task: Gradle@2
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    tasks: 'build'
+    publishJUnitResults: false
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.11'
+    gradleOptions: '-Xmx3072m'
+    sonarQubeRunAnalysis: true
+- task: JavaToolInstaller@0
+  inputs:
+    versionSpec: '8'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'LocalDirectory'
+    jdkFile: 'C:\jdk1.8.0_281.zip'
+    cleanDestinationDirectory: false
+- task: Gradle@2
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    tasks: 'build'
+    publishJUnitResults: false
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.11'
+    gradleOptions: '-Xmx3072m'
+    sonarQubeRunAnalysis: true
+
 - task: SonarCloudPrepare@1
   inputs:
     SonarCloud: 'sonarcloud'
