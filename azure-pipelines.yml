@@ -18,7 +18,8 @@ variables:
   dotnetSdkVersion: 6.x
 
 steps:
-- checkout: git:/CarsRentalApp/cars-rental-api
+- checkout: self
+  fetchDepth: 0
 
 - task: JavaToolInstaller@0
   displayName: 'Use JDK'
@@ -41,6 +42,8 @@ steps:
   inputs:
     packageType: 'sdk'
     version: '$(dotnetSdkVersion)'
+
+- checkout: self
 
 - task: DotNetCoreCLI@2
   displayName: 'Restore packages'
