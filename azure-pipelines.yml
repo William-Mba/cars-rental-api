@@ -6,16 +6,39 @@ pool:
   vmImage: windows-latest
 
 parameters:
+  - name: MajorVersion
+    type: number
+    default: 1
+  - name: MinorVersion
+    type: number
+    default: 0
   - name: RestoreBuildProjects
     type: string
     default: '**/*.csproj'
   - name: TestProjects
     type: string
     default: '**/*[Tt]ests/*.csproj'
+  - name: AssemblyVersion
+    type: string
+    default: "0.0.0.0"
 
 variables:
   BuildConfiguration: 'Release'
   dotnetSdkVersion: 6.x
+  buildDate: $(Get-Date -Format yyyyMMdd:hhmmss)
+  baseVersion: ${{ parameters.MajorVersion }}.${{ parameters.MinorVersion }}
+  baseVersionBeta: $(baseVersion).0-beta
+  ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+    versionRevision: $[counter(variables['baseVersion'], 0)]
+    version: $(baseversion).$(versionRevision)
+    assemblyVersion: $(variables.version)
+
+  ${{ if and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))) }}:
+    versionRevision: $[counter(variables['baseVersionBeta'], 0)]
+    version: $(baseVersionBeta).$(versionRevision)
+    assemblyVersion: $(baseVersion).0.$(versionRevision)
+
+  versionLong: ${{ parameters.MajorVersion }}.${{ parameters.MinorVersion }}.$(versionRevision).$(Build.BuildID)
 
 steps:
 - checkout: self
@@ -53,7 +76,7 @@ steps:
   displayName: "Build project" 
   inputs:
     projects: '${{ parameters.RestoreBuildProjects }}'
-    arguments: '--configuration $(BuildConfiguration)'
+    arguments: '--configuration $(BuildConfiguration) -p:VersionPrefix=${{ parameters.AssemblyVersion }}'
 
 - task: SonarCloudAnalyze@1
 
@@ -61,7 +84,7 @@ steps:
   displayName: "Execute Tests" 
   inputs:
     command: test
-    projects: '$(parameters.TestProjects)'
+    projects: '${{ parameters.TestProjects }}'
     arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
