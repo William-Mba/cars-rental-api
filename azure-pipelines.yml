@@ -2,96 +2,103 @@ trigger:
 - master
 
 pool:
-  name: Default
-  vmImage: ubuntu-latest
+  name: svr-cr
+  vmImage: windows-latest
 
 parameters:
+  - name: MajorVersion
+    type: number
+    default: 1
+  - name: MinorVersion
+    type: number
+    default: 0
   - name: RestoreBuildProjects
     type: string
     default: '**/*.csproj'
   - name: TestProjects
     type: string
     default: '**/*[Tt]ests/*.csproj'
+  - name: AssemblyVersion
+    type: string
+    default: "0.0.0.0"
 
 variables:
-  Major: '1'
-  Minor: '0'
-  Patch: '0'
   BuildConfiguration: 'Release'
-  dotnetSdkVersion: 6.0.x
+  dotnetSdkVersion: 6.x
+  buildDate: '$(Get-Date -Format yyyyMMdd:hhmmss)'
+  baseVersion: '${{ parameters.MajorVersion }}.${{ parameters.MinorVersion }}'
+  baseVersionBeta: ${{ variables.baseVersion }}.0-beta
+  ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
+    versionRevision: $[counter(variables['baseVersion'], 0)]
+    version: ${{ variables.baseversion }}.$(versionRevision)
+    assemblyVersion: ${{ variables.version }}
 
+  ${{ if and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))) }}:
+    versionRevision: $[counter(variables['baseVersionBeta'], 0)]
+    version: ${{ variables.baseVersionBeta }}.$(versionRevision)
+    assemblyVersion: ${{ variables.baseVersion }}.0.$(versionRevision)
+
+  versionLong: '${{ parameters.MajorVersion }}.${{ parameters.MinorVersion }}.$(versionRevision).$(Build.BuildID)'
 
 steps:
+- checkout: self
+  fetchDepth: 0
+
+- task: JavaToolInstaller@0
+  displayName: 'Use JDK'
+  inputs:
+    versionSpec: '11'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'LocalDirectory'
+    jdkFile: 'C:\agents\svr-cr\jdk-11.0.18_windows-x64_bin.zip'
+    cleanDestinationDirectory: false
+- task: SonarCloudPrepare@1
+  inputs:
+    SonarCloud: 'sonarcloud'
+    organization: '10ference'
+    scannerMode: 'MSBuild'
+    projectKey: '10ference_cars-rental-api'
+    projectName: 'cars-rental-api'
 
 - task: UseDotNet@2
-  displayName: 'Sélection de la version de .NET'
+  displayName: 'Use .NET'
   inputs:
     packageType: 'sdk'
     version: '$(dotnetSdkVersion)'
 
 - task: DotNetCoreCLI@2
-  displayName: "[Restore] Restoring packages.."
+  displayName: 'Restore packages'
   inputs:
     command: 'restore'
-    projects: 'https://dev.azure.com/10ference/FormationDevOps/_git/SpaceGame/**/*.csproj'
-    restoreArguments: '-p:AssemblyVersion=$(Major).$(Minor).$(Patch).$(rev:.r)'
-    feedsToUse: 'select'
-    vstsFeed: 'db55ada9-b434-4bdc-bfd5-90d3c7fae142/dd0205ff-7e0a-485b-8c26-ae86e9b0ba98' 
+    projects: '${{ parameters.RestoreBuildProjects }}'
 
-# - task: DotNetCoreCLI@2
-#   displayName: "[Restore] Restoring packages.." 
-#   inputs:
-#     command: restore
-#     projects: '$(parameters.RestoreBuildProjects)'
 - task: DotNetCoreCLI@2
+  displayName: "Build project" 
   inputs:
-    command: 'build'
-    projects: 'https://dev.azure.com/10ference/FormationDevOps/_git/SpaceGame/**/*.csproj'
-    arguments: '--configuration $(BuildConfiguration) -p:AssemblyVersion=$(Major).$(Minor).$(Patch).$(rev:.r)'
+    projects: '${{ parameters.RestoreBuildProjects }}'
+    arguments: '--configuration $(BuildConfiguration) -p:VersionPrefix=$(versionLong)'
 
-# - task: DotNetCoreCLI@2
-#   displayName: "[Build] Building packages.." 
-#   inputs:
-#     projects: '$(parameters.RestoreBuildProjects)'
-#     arguments: '--configuration $(BuildConfiguration)'
+- script: echo Version= $(versionLong)
+  displayName: "Build Version"
+
+- task: SonarCloudAnalyze@1
 
 - task: DotNetCoreCLI@2
-  displayName: "[Test] Executing Tests.." 
+  displayName: "Execute Tests" 
   inputs:
     command: test
-    projects: '$(parameters.TestProjects)'
+    projects: '${{ parameters.TestProjects }}'
     arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: "[Publish] Publishing artefacts.." 
+  displayName: "Publish artefacts" 
   inputs:
     command: publish
     publishWebProjects: True
     arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
     zipAfterPublish: True
 
-- task: PublishBuildArtifacts@1
-  displayName: '[Publish] Publish Artifact'
+- task: SonarCloudPublish@1
+  displayName: "Publish SonarCloud Results" 
   inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)'
-  condition: succeededOrFailed()
-
-- task: DotNetCoreCLI@2
-  inputs:
-    command: pack
-    versioningScheme: byPrereleaseNumber
-    majorVersion: '$(Major)'
-    minorVersion: '$(Minor)'
-    patchVersion: '$(Patch)'
-  displayName: "Packaging.." 
-
-- task: NuGetAuthenticate@0
-  displayName: '[Authentication] NuGet Authentication'
-  inputs:
-    nuGetServiceConnections: az-artifacts-sc
-
-- script: |
-    dotnet build $(Build.ArtifactStagingDirectory) --configuration $(BuildConfiguration)
-    dotnet pack $(Build.ArtifactStagingDirectory) --output $(Build.ArtifactStagingDirectory) --configuration <CONFIGURATION>
-    dotnet nuget push $(Build.ArtifactStagingDirectory) --source https://pkgs.dev.azure.com/10ference/db55ada9-b434-4bdc-bfd5-90d3c7fae142/_packaging/carsrental-api/nuget/v3/index.json --api-key "az-artifacts-sc"
-  displayName: "Build, pack and push"  
+    pollingTimeoutSec: '300'
