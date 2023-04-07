@@ -9,7 +9,7 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["CarsRental.Api/CarsRental.Api.csproj", "CarsRental.Api/"]
 RUN dotnet restore "CarsRental.Api/CarsRental.Api.csproj"
-COPY ./cars-rental-api* .
+COPY ./cars-rental-api .
 WORKDIR "/src/CarsRental.Api"
 RUN dotnet build "CarsRental.Api.csproj" -c Release -o /app/build
 
