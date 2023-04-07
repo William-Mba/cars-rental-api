@@ -21,24 +21,24 @@ parameters:
   - name: AssemblyVersion
     type: string
     default: "0.0.0.0"
-    # values:
-    #   - '$(assemblyVersion)'
+    values:
+      - '${{ assemblyVersion }}'
 
 variables:
   BuildConfiguration: 'Release'
   dotnetSdkVersion: 6.x
   buildDate: '$(Get-Date -Format yyyyMMdd:hhmmss)'
   baseVersion: '${{ parameters.MajorVersion }}.${{ parameters.MinorVersion }}'
-  baseVersionBeta: '$(baseVersion).0-beta'
+  baseVersionBeta: ${{ variables.baseVersion }}.0-beta
   ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}:
     versionRevision: $[counter(variables['baseVersion'], 0)]
-    version: '$(baseversion).$(versionRevision)'
-    assemblyVersion: '$(variables.version)'
+    version: ${{ variables.baseversion }}.$(versionRevision)
+    assemblyVersion: ${{ variables.version }}
 
   ${{ if and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))) }}:
     versionRevision: $[counter(variables['baseVersionBeta'], 0)]
-    version: '$(baseVersionBeta).$(versionRevision)'
-    assemblyVersion: '$(baseVersion).0.$(versionRevision)'
+    version: ${{ variables.baseVersionBeta }}.$(versionRevision)
+    assemblyVersion: ${{ variables.baseVersion }}.0.$(versionRevision)
 
   versionLong: '${{ parameters.MajorVersion }}.${{ parameters.MinorVersion }}.$(versionRevision).$(Build.BuildID)'
 
