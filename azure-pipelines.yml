@@ -72,7 +72,7 @@ steps:
     command: 'restore'
     projects: '${{ parameters.RestoreBuildProjects }}'
 
-- script: '$(assemblyVersion)'
+- script: echo '$(assemblyVersion)'
   displayName: "Assembly Version Generated"
 
 - task: DotNetCoreCLI@2
