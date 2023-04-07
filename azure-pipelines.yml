@@ -12,7 +12,7 @@ parameters:
   - name: MinorVersion
     type: number
     default: 0
-  - name: RestoreBuildProjects
+  - name: Projects
     type: string
     default: '**/*.csproj'
   - name: TestProjects
@@ -76,12 +76,12 @@ steps:
   displayName: 'Restore packages'
   inputs:
     command: 'restore'
-    projects: '${{ parameters.RestoreBuildProjects }}'
+    projects: '${{ parameters.Projects }}'
 
 - task: DotNetCoreCLI@2
   displayName: "Build project" 
   inputs:
-    projects: '${{ parameters.RestoreBuildProjects }}'
+    projects: '${{ parameters.Projects }}'
     arguments: '--configuration $(BuildConfiguration) -p:VersionPrefix=$(versionLong)'
 
 - script: echo Version= $(versionLong)
