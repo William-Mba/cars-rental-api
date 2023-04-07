@@ -23,21 +23,40 @@ steps:
   fetchDepth: 0
 
 - task: JavaToolInstaller@0
+  displayName: 'Use JDK'
   inputs:
     versionSpec: '11'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: 'LocalDirectory'
     jdkFile: 'C:\agents\svr-cr\jdk-11.0.18_windows-x64_bin.zip'
     cleanDestinationDirectory: false
-- task: Gradle@2
+- task: Gradle@3
+  displayName: 'Use Gradle'
   inputs:
     gradleWrapperFile: 'gradlew'
     tasks: 'build'
     publishJUnitResults: false
     javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
-    gradleOptions: '-Xmx3072m'
     sonarQubeRunAnalysis: true
+    sqGradlePluginVersionChoice: 'build'
+    spotBugsAnalysis: false
+
+# - task: JavaToolInstaller@0
+#   inputs:
+#     versionSpec: '8'
+#     jdkArchitectureOption: 'x64'
+#     jdkSourceOption: 'LocalDirectory'
+#     jdkFile: 'C:\jdk1.8.0_281.zip'
+#     cleanDestinationDirectory: false
+# - task: Gradle@2
+#   inputs:
+#     gradleWrapperFile: 'gradlew'
+#     tasks: 'build'
+#     publishJUnitResults: false
+#     javaHomeOption: 'JDKVersion'
+#     jdkVersionOption: '1.11'
+#     gradleOptions: '-Xmx3072m'
+#     sonarQubeRunAnalysis: false
 
 - task: SonarCloudPrepare@1
   inputs:
