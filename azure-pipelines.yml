@@ -21,6 +21,15 @@ parameters:
   - name: AssemblyVersion
     type: string
     default: "0.0.0.0"
+  - name: WorkingDirectory
+    type: string
+    default: $(Build.SourcesDirectory)
+  - name: ArtifactName
+    type: string
+    default: drop
+  - name: BuildConfiguration
+    type: string
+    default: Release
 
 variables:
   BuildConfiguration: 'Release'
@@ -87,19 +96,24 @@ steps:
     projects: '${{ parameters.TestProjects }}'
     arguments: '--configuration $(BuildConfiguration)'
 
-- task: ArchiveFiles@2
+- task: DotNetCoreCLI@2
+  displayName: '[publish] Publish ${{ parameters.BuildConfiguration }}'
   inputs:
-    rootFolderOrFile: '$(Build.BinariesDirectory)'
-    includeRootFolder: true
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory).zip'
-    replaceExistingArchive: true
+    command: publish
+    arguments: >
+      --configuration ${{ parameters.BuildConfiguration }} 
+      --output $(Build.ArtifactStagingDirectory)/publish/$(Build.BuildNumber)
+    zipAfterPublish: True
+    workingDirectory: ${{ parameters.WorkingDirectory }}
+    publishWebProjects: false
+    modifyOutputPath: false
+    projects: ${{ parameters.Projects }}
 
-- task: PublishPipelineArtifact@1
+- task: PublishBuildArtifacts@1
+  displayName: '[publish] Build Artifacts'
   inputs:
-    targetPath: '$(Pipeline.Workspace)'
-    publishLocation: 'pipeline'
-    artifact: 'drop/$(Build.ArtifactStagingDirectory).zip'
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)/publish/$(Build.BuildNumber)'
+    artifactName: ${{ parameters.ArtifactName }}
 
 - task: SonarCloudPublish@1
   displayName: "Publish SonarCloud Results" 
