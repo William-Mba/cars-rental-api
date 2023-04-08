@@ -15,6 +15,9 @@ parameters:
   - name: Projects
     type: string
     default: '**/*.csproj'
+  - name: ProjectName
+    type: string
+    default: 'cars-rental-api'
   - name: TestProjects
     type: string
     default: '**/*[Tt]ests/*.csproj'
@@ -102,7 +105,7 @@ steps:
     command: publish
     arguments: >
       --configuration ${{ parameters.BuildConfiguration }} 
-      --output $(Build.ArtifactStagingDirectory)\publish\$(Build.BuildNumber)
+      --output $(Build.ArtifactStagingDirectory)\publish\${{ parameters.ProjectName }}.$(Build.BuildNumber)
     zipAfterPublish: True
     workingDirectory: ${{ parameters.WorkingDirectory }}
     publishWebProjects: true
@@ -112,7 +115,7 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: '[publish] Build Artifacts'
   inputs:
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)\publish\$(Build.BuildNumber)'
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)\publish\${{ parameters.ProjectName }}.$(Build.BuildNumber)'
     artifactName: ${{ parameters.ArtifactName }}
 
 - task: SonarCloudPublish@1
