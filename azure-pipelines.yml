@@ -123,17 +123,18 @@ steps:
   inputs:
     pollingTimeoutSec: '300'
 - task: GitHubRelease@1
-  displayName: 'Release on GitHub from $(Build.Repository.Name) - V$(Build.SourceVersion)'
+  displayName: 'Release on GitHub'
   inputs:
     gitHubConnection: 'github'
     repositoryName: 'William-Mba/cars-rental-api'
     action: 'create'
     target: '$(Build.SourceVersion)'
-    tagSource: 'gitTag'
+    tagSource: 'userSpecifiedTag'
     tag: 'v1.2.3'
-    title: 'Smooth'
+    title: 'Amazing new features'
     releaseNotesSource: 'inline'
     releaseNotesInline: '--generate-notes'
+    assets: '$(Build.ArtifactStagingDirectory)\publish\${{ parameters.ProjectName }}.$(Build.BuildNumber)\*.zip'
     isPreRelease: true
     changeLogCompareToRelease: 'lastFullRelease'
     changeLogType: 'commitBased'
