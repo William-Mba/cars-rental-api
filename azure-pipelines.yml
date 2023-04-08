@@ -122,16 +122,18 @@ steps:
   displayName: "Publish SonarCloud Results" 
   inputs:
     pollingTimeoutSec: '300'
-
 - task: GitHubRelease@1
-  displayName: 'Release on GitHub'
+  displayName: 'Release on GitHub from $(Build.Repository.Name) - V$(Build.SourceVersion)'
   inputs:
     gitHubConnection: 'github'
-    repositoryName: '$(Build.Repository.Name)'
+    repositoryName: 'William-Mba/cars-rental-api'
     action: 'create'
     target: '$(Build.SourceVersion)'
     tagSource: 'gitTag'
     tagPattern: 'v1.*'
+    title: 'Smooth'
+    releaseNotesSource: 'inline'
+    releaseNotesInline: '--generate-notes'
     isPreRelease: true
     changeLogCompareToRelease: 'lastFullRelease'
     changeLogType: 'commitBased'
