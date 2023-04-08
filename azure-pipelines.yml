@@ -130,7 +130,6 @@ steps:
     action: 'create'
     target: '$(Build.SourceVersion)'
     tagSource: 'gitTag'
-    tagPattern: '*'
     tag: 'v1.2.3'
     title: 'Smooth'
     releaseNotesSource: 'inline'
