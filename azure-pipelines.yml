@@ -122,3 +122,16 @@ steps:
   displayName: "Publish SonarCloud Results" 
   inputs:
     pollingTimeoutSec: '300'
+
+- task: GitHubRelease@1
+  displayName: 'Release on GitHub'
+  inputs:
+    gitHubConnection: 'github'
+    repositoryName: '$(Build.Repository.Name)'
+    action: 'create'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'gitTag'
+    tagPattern: 'v1.*'
+    isPreRelease: true
+    changeLogCompareToRelease: 'lastFullRelease'
+    changeLogType: 'commitBased'
