@@ -3,7 +3,7 @@ trigger:
 
 pool:
   name: svr-cr
-  vmImage: windows-latest
+  vmImage: ubuntu-latest
 
 parameters:
   - name: MajorVersion
@@ -102,7 +102,7 @@ steps:
     command: publish
     arguments: >
       --configuration ${{ parameters.BuildConfiguration }} 
-      --output $(Build.ArtifactStagingDirectory)/publish/$(Build.BuildNumber)
+      --output $(Build.ArtifactStagingDirectory)\publish\$(Build.BuildNumber)
     zipAfterPublish: True
     workingDirectory: ${{ parameters.WorkingDirectory }}
     publishWebProjects: true
@@ -112,7 +112,7 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: '[publish] Build Artifacts'
   inputs:
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)/publish/$(Build.BuildNumber)'
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)\publish\$(Build.BuildNumber)'
     artifactName: ${{ parameters.ArtifactName }}
 
 - task: SonarCloudPublish@1
