@@ -16,7 +16,8 @@ namespace CarsRental.Api.Options
         }
         public void Configure(SwaggerGenOptions options)
         {
-            // add swagger document for every API version discovered
+            // add swagger document for every API version discovered 
+            // TODO
             foreach (var description in provider.ApiVersionDescriptions)
             {
                 options.SwaggerDoc(
