@@ -3,7 +3,7 @@ trigger:
 
 pool:
   name: svr-cr
-  vmImage: windows-latest
+  vmImage: ubuntu-latest
 
 parameters:
   - name: MajorVersion
@@ -12,15 +12,27 @@ parameters:
   - name: MinorVersion
     type: number
     default: 0
-  - name: RestoreBuildProjects
+  - name: Projects
     type: string
     default: '**/*.csproj'
+  - name: ProjectName
+    type: string
+    default: 'cars-rental-api'
   - name: TestProjects
     type: string
     default: '**/*[Tt]ests/*.csproj'
   - name: AssemblyVersion
     type: string
     default: "0.0.0.0"
+  - name: WorkingDirectory
+    type: string
+    default: $(Build.SourcesDirectory)
+  - name: ArtifactName
+    type: string
+    default: drop
+  - name: BuildConfiguration
+    type: string
+    default: Release
 
 variables:
   BuildConfiguration: 'Release'
@@ -41,9 +53,6 @@ variables:
   versionLong: '${{ parameters.MajorVersion }}.${{ parameters.MinorVersion }}.$(versionRevision).$(Build.BuildID)'
 
 steps:
-- checkout: self
-  fetchDepth: 0
-
 - task: JavaToolInstaller@0
   displayName: 'Use JDK'
   inputs:
@@ -70,12 +79,12 @@ steps:
   displayName: 'Restore packages'
   inputs:
     command: 'restore'
-    projects: '${{ parameters.RestoreBuildProjects }}'
+    projects: '${{ parameters.Projects }}'
 
 - task: DotNetCoreCLI@2
   displayName: "Build project" 
   inputs:
-    projects: '${{ parameters.RestoreBuildProjects }}'
+    projects: '${{ parameters.Projects }}'
     arguments: '--configuration $(BuildConfiguration) -p:VersionPrefix=$(versionLong)'
 
 - script: echo Version= $(versionLong)
@@ -91,12 +100,23 @@ steps:
     arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: "Publish artefacts" 
+  displayName: '[publish] Publish ${{ parameters.BuildConfiguration }}'
   inputs:
     command: publish
-    publishWebProjects: True
-    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+    arguments: >
+      --configuration ${{ parameters.BuildConfiguration }} 
+      --output $(Build.ArtifactStagingDirectory)\publish\${{ parameters.ProjectName }}.$(Build.BuildNumber)
     zipAfterPublish: True
+    workingDirectory: ${{ parameters.WorkingDirectory }}
+    publishWebProjects: true
+    modifyOutputPath: false
+    projects: ${{ parameters.Projects }}
+
+- task: PublishBuildArtifacts@1
+  displayName: '[publish] Build Artifacts'
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)\publish\${{ parameters.ProjectName }}.$(Build.BuildNumber)'
+    artifactName: ${{ parameters.ArtifactName }}
 
 - task: SonarCloudPublish@1
   displayName: "Publish SonarCloud Results" 
